@@ -1,0 +1,20 @@
+{
+  "name": "macalc",
+  "version": "2.0.0",
+  "description": "The most comprehensive everyday calculator MCP server — 501 tools, 22 categories, 8 countries. Free, no API key.",
+  "url": "https://macalculatriceenligne.com/api/mcp",
+  "transport": "streamable-http",
+  "auth": "none",
+  "tools_count": 501,
+  "categories": [
+    "Finance FR", "Finance BE", "Finance CH", "Finance CA",
+    "Finance US", "Finance UK", "Finance MA", "Finance SN",
+    "Health", "Sport", "Math", "Construction",
+    "Science", "Conversions", "Education", "Real Estate",
+    "Cooking", "Travel", "Animals", "Astronomy",
+    "Textile", "Automotive"
+  ],
+  "homepage": "https://macalculatriceenligne.com/mcp/",
+  "repository": "https://github.com/tresorsec/macalc-mcp",
+  "tags": ["calculator", "math", "finance", "tax", "health", "science", "construction", "conversions", "education", "cooking", "travel", "real-estate", "astronomy", "free", "no-auth", "worldwide"]
+}
