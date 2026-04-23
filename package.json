@@ -1,0 +1,51 @@
+{
+  "name": "macalc-mcp",
+  "version": "0.1.0",
+  "description": "The most comprehensive everyday calculator MCP server — 501 tools, 22 categories, 8 countries' tax systems. Free, no API key.",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "macalc-mcp": "src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "server.json"
+  ],
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "calculator",
+    "math",
+    "finance",
+    "tax",
+    "health",
+    "construction",
+    "conversions",
+    "education",
+    "france",
+    "belgium",
+    "switzerland",
+    "canada"
+  ],
+  "author": "tresor4k",
+  "license": "MIT",
+  "homepage": "https://macalculatriceenligne.com/mcp/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tresor4k/macalc-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tresor4k/macalc-mcp/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1"
+  }
+}

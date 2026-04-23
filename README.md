@@ -6,13 +6,45 @@
 
 ## Quick Start
 
-Add to your MCP client (Claude Desktop, Cursor, VS Code, Windsurf):
+Two install modes — pick whichever your MCP client supports.
+
+### Option A — Remote (Streamable HTTP, zero install)
+
+For clients with native remote MCP support (Claude Desktop ≥ 0.8, Cursor, Windsurf, VS Code MCP, etc.):
 
 ```json
 {
   "mcpServers": {
     "macalc": {
       "url": "https://macalculatriceenligne.com/api/mcp"
+    }
+  }
+}
+```
+
+### Option B — Local stdio proxy (works everywhere)
+
+For clients that only speak stdio, or sandboxed environments:
+
+```json
+{
+  "mcpServers": {
+    "macalc": {
+      "command": "npx",
+      "args": ["-y", "macalc-mcp"]
+    }
+  }
+}
+```
+
+Or with Docker:
+
+```json
+{
+  "mcpServers": {
+    "macalc": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "ghcr.io/tresor4k/macalc-mcp:latest"]
     }
   }
 }
