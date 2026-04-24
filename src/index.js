@@ -6,8 +6,9 @@
  * older Cursor builds, sandboxed CI environments) reach the hosted endpoint
  * at https://macalculatriceenligne.com/api/mcp without any API key.
  *
- * Behavior: boots a local stdio MCP server, opens a Streamable HTTP client
- * to the remote, and proxies tools/list + tools/call through. No local state.
+ * Design: lazy connect on first request, cached client, graceful degradation
+ * if the remote is temporarily unavailable — the server still boots so MCP
+ * clients (and registry scanners like Glama) can introspect capabilities.
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -24,32 +25,46 @@ const REMOTE_URL =
 
 const SERVER_INFO = {
   name: "macalc-mcp",
-  version: "0.1.0",
+  version: "0.1.1",
 };
 
-async function connectRemote() {
-  const client = new Client(
-    { name: "macalc-mcp-stdio-proxy", version: SERVER_INFO.version },
-    { capabilities: {} }
-  );
-  const transport = new StreamableHTTPClientTransport(new URL(REMOTE_URL));
-  await client.connect(transport);
-  return client;
+let _clientPromise = null;
+function getRemote() {
+  if (!_clientPromise) {
+    _clientPromise = (async () => {
+      const client = new Client(
+        { name: "macalc-mcp-stdio-proxy", version: SERVER_INFO.version },
+        { capabilities: {} }
+      );
+      const transport = new StreamableHTTPClientTransport(new URL(REMOTE_URL));
+      await client.connect(transport);
+      return client;
+    })().catch((err) => {
+      _clientPromise = null; // allow retry on next request
+      throw err;
+    });
+  }
+  return _clientPromise;
 }
 
 async function main() {
-  const remote = await connectRemote();
-
   const server = new Server(SERVER_INFO, {
     capabilities: { tools: {} },
   });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    return await remote.listTools();
+    try {
+      const remote = await getRemote();
+      return await remote.listTools();
+    } catch (err) {
+      console.error("[macalc-mcp] tools/list failed:", err?.message || err);
+      return { tools: [] };
+    }
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
+    const remote = await getRemote();
     return await remote.callTool({ name, arguments: args ?? {} });
   });
 
@@ -58,7 +73,10 @@ async function main() {
 
   const shutdown = async () => {
     try {
-      await remote.close();
+      if (_clientPromise) {
+        const c = await _clientPromise.catch(() => null);
+        if (c) await c.close();
+      }
     } catch {}
     try {
       await server.close();
