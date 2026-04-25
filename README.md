@@ -1,6 +1,6 @@
 # macalc — The Most Comprehensive Everyday Calculator MCP Server
 
-[![macalc MCP server](https://glama.ai/mcp/servers/badge)](https://glama.ai/mcp/servers)
+[![macalc MCP server](https://glama.ai/mcp/servers/tresor4k/macalc-mcp/badges/card.svg)](https://glama.ai/mcp/servers/tresor4k/macalc-mcp)
 
 **501 calculator tools** across **22 categories** covering **8 countries' tax systems**. Free, no API key required.
 
@@ -10,7 +10,7 @@ Two install modes — pick whichever your MCP client supports.
 
 ### Option A — Remote (Streamable HTTP, zero install)
 
-For clients with native remote MCP support (Claude Desktop ≥ 0.8, Cursor, Windsurf, VS Code MCP, etc.):
+For clients with native remote MCP support (Claude Desktop ≥ 0.8, Cursor, Windsurf, VS Code MCP, etc.)
 
 ```json
 {
