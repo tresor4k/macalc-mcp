@@ -29,7 +29,7 @@ const REMOTE_URL =
 
 const SERVER_INFO = {
   name: "macalc-mcp",
-  version: "0.2.0",
+  version: "0.2.1",
 };
 
 let _clientPromise = null;
