@@ -7,8 +7,8 @@
  * at https://macalculatriceenligne.com/api/mcp without any API key.
  *
  * Design: lazy connect on first request, cached client, graceful degradation
- * if the remote is temporarily unavailable — the server still boots so MCP
- * clients (and registry scanners like Glama) can introspect capabilities.
+ * if the remote is temporarily unavailable. Forwards tools, prompts, and
+ * resources transparently.
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -18,6 +18,10 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
 const REMOTE_URL =
@@ -25,7 +29,7 @@ const REMOTE_URL =
 
 const SERVER_INFO = {
   name: "macalc-mcp",
-  version: "0.1.1",
+  version: "0.2.0",
 };
 
 let _clientPromise = null;
@@ -40,7 +44,7 @@ function getRemote() {
       await client.connect(transport);
       return client;
     })().catch((err) => {
-      _clientPromise = null; // allow retry on next request
+      _clientPromise = null;
       throw err;
     });
   }
@@ -49,7 +53,11 @@ function getRemote() {
 
 async function main() {
   const server = new Server(SERVER_INFO, {
-    capabilities: { tools: {} },
+    capabilities: {
+      tools: {},
+      prompts: {},
+      resources: {},
+    },
   });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -66,6 +74,39 @@ async function main() {
     const { name, arguments: args } = request.params;
     const remote = await getRemote();
     return await remote.callTool({ name, arguments: args ?? {} });
+  });
+
+  server.setRequestHandler(ListPromptsRequestSchema, async () => {
+    try {
+      const remote = await getRemote();
+      return await remote.listPrompts();
+    } catch (err) {
+      console.error("[macalc-mcp] prompts/list failed:", err?.message || err);
+      return { prompts: [] };
+    }
+  });
+
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+    const remote = await getRemote();
+    return await remote.getPrompt({
+      name: request.params.name,
+      arguments: request.params.arguments ?? {},
+    });
+  });
+
+  server.setRequestHandler(ListResourcesRequestSchema, async () => {
+    try {
+      const remote = await getRemote();
+      return await remote.listResources();
+    } catch (err) {
+      console.error("[macalc-mcp] resources/list failed:", err?.message || err);
+      return { resources: [] };
+    }
+  });
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    const remote = await getRemote();
+    return await remote.readResource({ uri: request.params.uri });
   });
 
   const transport = new StdioServerTransport();

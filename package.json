@@ -1,6 +1,6 @@
 {
   "name": "macalc-mcp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "The most comprehensive everyday calculator MCP server — 501 tools, 22 categories, 8 countries' tax systems. Free, no API key.",
   "type": "module",
   "main": "src/index.js",
