@@ -1,7 +1,7 @@
 {
   "name": "macalc-mcp",
-  "version": "0.3.1",
-  "description": "The most comprehensive everyday calculator MCP server — 501 tools, 22 categories, 8 countries' tax systems. Free, no API key.",
+  "version": "0.4.0",
+  "description": "Everyday calculator MCP server — curated core of 15 well-scoped tools (income tax FR/US/UK/CA, mortgage, compound interest, VAT, BMI, TDEE…) with on-demand access to the full 446-calculator macalc catalog. Free, no API key.",
   "type": "module",
   "main": "src/index.js",
   "bin": {
@@ -10,12 +10,14 @@
   "files": [
     "src",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE",
     "server.json"
   ],
   "scripts": {
     "start": "node src/index.js",
-    "build": "node --check src/index.js",
+    "build": "node --check src/index.js && node --check src/core-tools.js",
+    "test": "node test/smoke.mjs",
     "prepare": "node --check src/index.js"
   },
   "keywords": [

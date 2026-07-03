@@ -1,8 +1,34 @@
-# macalc — The Most Comprehensive Everyday Calculator MCP Server
+# macalc — Everyday Calculator MCP Server
 
+[![npm version](https://img.shields.io/npm/v/macalc-mcp)](https://www.npmjs.com/package/macalc-mcp)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 [![macalc MCP server](https://glama.ai/mcp/servers/tresor4k/macalc-mcp/badges/card.svg)](https://glama.ai/mcp/servers/tresor4k/macalc-mcp)
 
-**501 calculator tools** across **22 categories** covering **8 countries' tax systems**. Free, no API key required.
+A **curated core of 15 well-scoped calculator tools** — income tax (France, US, UK, Canada), gross-to-net salary, mortgage, compound interest, loans, VAT, percentages, BMI, TDEE — with on-demand access to the **full macalc catalog of 446 calculators** (22 categories, 8 countries' tax systems) through a discovery + dispatcher workflow. Free, no API key required.
+
+## Core tools (default profile)
+
+| Tool | What it does |
+|------|--------------|
+| `calculate_french_income_tax` | French income tax 2026 (Article 197 CGI, family quotient) |
+| `calculate_french_salary` | French gross → net salary 2026 (cadre / non-cadre / civil servant) |
+| `calculate_us_federal_tax` | US federal income tax 2026 (IRS brackets + standard deduction) |
+| `calculate_uk_income_tax` | UK income tax 2025/26 (HMRC bands, allowance taper) |
+| `calculate_canada_federal_tax` | Canadian federal income tax (CRA brackets + BPA) |
+| `calculate_mortgage` | Monthly payment, total interest, amortization schedule |
+| `calculate_compound_interest` | Lump-sum compound growth with yearly breakdown |
+| `calculate_loan_payment` | Generic amortizing loan (term in months) |
+| `calculate_percentage` | Percent of total / percent change / what-percent |
+| `calculate_vat_generic` | Add or remove VAT/GST/sales tax at any rate |
+| `calculate_bmi` | Body Mass Index + WHO category |
+| `calculate_tdee` | Maintenance calories from BMR + activity level |
+| `list_bundles` | Discover the 31 thematic bundles of the full catalog |
+| `get_bundle_tools` | List the tools inside one bundle |
+| `call_any_calculator` | Invoke **any** of the 446 hosted calculators by name |
+
+Need something not in the core (notary fees, concrete volume, VMA, pet food…)? `list_bundles` → `get_bundle_tools(bundle_id)` → `call_any_calculator(tool_name, arguments)`.
+
+Prefer the raw 446-tool listing? Set the env var `MACALC_MCP_FULL=1`.
 
 ## Quick Start
 
@@ -52,7 +78,11 @@ Or with Docker:
 
 That's it. No API key, no auth, no setup.
 
-## What's Inside — 501 Tools
+> Note: Option A (remote URL) serves the **full 446-tool catalog** directly.
+> Option B (this npm wrapper) serves the curated 15-tool core profile by default —
+> lighter on your agent's context window — with the full catalog one dispatcher call away.
+
+## What's Inside — The Full Catalog
 
 ### Finance (8 countries)
 | Country | Tools | Examples |
@@ -123,7 +153,7 @@ Ask your AI assistant:
 
 > "Calculate the French income tax on 45,000€ for a single person"
 
-The assistant calls `calculate_ir_france` with `{revenu_net_imposable: 45000, parts: 1}` and returns:
+The assistant calls `calculate_french_income_tax` with `{income: 45000, parts: 1}` and returns:
 
 ```json
 {
@@ -153,7 +183,7 @@ Animals (8)         Astronomy (8)       Textile (5)
 Automotive (10)
 ```
 
-**Total: 501 tools**
+**Total: 446 tools** (hosted catalog — counts per category are approximate)
 
 ## Links
 
