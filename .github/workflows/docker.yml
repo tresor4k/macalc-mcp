@@ -1,0 +1,82 @@
+name: docker
+
+# Builds the image from the tagged source, tests it, then publishes it to Docker Hub.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: tresor4k/macalc-mcp
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Read version
+        id: v
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test (source)
+        run: npm ci && npm test
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build (amd64, local)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: macalc-mcp:test
+
+      - name: Test the image
+        run: |
+          set -euo pipefail
+          test "$(docker run --rm --entrypoint id macalc-mcp:test -u)" = "1000"
+          {
+            printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"ci","version":"1"}}}'
+            printf '%s\n' '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+            printf '%s\n' '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+            printf '%s\n' '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"calculate_mortgage","arguments":{"principal":200000,"annual_rate":3.5,"years":20}}}'
+            sleep 20
+          } | docker run -i --rm macalc-mcp:test > out.jsonl
+          jq -e -s --arg v "${{ steps.v.outputs.version }}" '
+            (map(select(.id == 1))[0].result.serverInfo.version == $v)
+            and ((map(select(.id == 2))[0].result.tools | length) == 15)
+            and ((map(select(.id == 3))[0].result.content[0].text | fromjson | .result.monthly_payment) as $m | ($m > 1158.9 and $m < 1160.9))
+          ' out.jsonl
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.v.outputs.version }}
+            ${{ env.IMAGE }}:latest
+          labels: |
+            org.opencontainers.image.title=macalc-mcp
+            org.opencontainers.image.description=Everyday calculator MCP server (stdio): 15 core calculator tools, full macalc catalog on demand. Free, no API key.
+            org.opencontainers.image.url=https://macalculatriceenligne.com/mcp/
+            org.opencontainers.image.source=https://github.com/tresor4k/macalc-mcp
+            org.opencontainers.image.version=${{ steps.v.outputs.version }}
+            org.opencontainers.image.licenses=MIT
+
+      - name: Inspect the published image
+        run: docker buildx imagetools inspect "$IMAGE:${{ steps.v.outputs.version }}"
