@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/macalc-mcp)](https://www.npmjs.com/package/macalc-mcp)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 [![macalc MCP server](https://glama.ai/mcp/servers/tresor4k/macalc-mcp/badges/card.svg)](https://glama.ai/mcp/servers/tresor4k/macalc-mcp)
+[![MCP Queen operational grade](https://mcpqueen.com/badge/io.github.tresor4k/macalc-mcp.svg)](https://mcpqueen.com/s/io.github.tresor4k/macalc-mcp)
 
 A **curated core of 15 well-scoped calculator tools** — income tax (France, US, UK, Canada), gross-to-net salary, mortgage, compound interest, loans, VAT, percentages, BMI, TDEE — with on-demand access to the **full macalc catalog of 446 calculators** (22 categories, 8 countries' tax systems) through a discovery + dispatcher workflow. Free, no API key required.
 
