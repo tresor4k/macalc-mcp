@@ -63,14 +63,14 @@ For clients that only speak stdio, or sandboxed environments:
 }
 ```
 
-Or with Docker:
+Or with Docker ([`tresor4k/macalc-mcp`](https://hub.docker.com/r/tresor4k/macalc-mcp) on Docker Hub):
 
 ```json
 {
   "mcpServers": {
     "macalc": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "ghcr.io/tresor4k/macalc-mcp:latest"]
+      "args": ["run", "-i", "--rm", "tresor4k/macalc-mcp"]
     }
   }
 }

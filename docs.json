@@ -1,0 +1,12 @@
+{
+  "name": "macalc MCP",
+  "description": "MCP server for everyday calculators: a curated core of 15 tools with on-demand access to the full macalc catalog of 446 calculators.",
+  "sidebar": [
+    {
+      "pages": [
+        { "title": "Overview", "href": "/" },
+        { "title": "Tools", "href": "/tools" }
+      ]
+    }
+  ]
+}

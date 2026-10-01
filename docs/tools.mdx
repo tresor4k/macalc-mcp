@@ -1,0 +1,140 @@
+---
+title: Tools
+description: The 15 core tools of macalc-mcp, with their parameters.
+---
+
+# Tools
+
+The stdio wrapper exposes these 15 tools by default. All of them are annotated read-only, non-destructive and
+idempotent. Extra keys are refused (`additionalProperties: false`).
+
+| Tool | What it does |
+|---|---|
+| `calculate_french_income_tax` | French income tax 2026 (Article 197 CGI, family quotient) |
+| `calculate_french_salary` | French gross to net salary 2026 (cadre / non-cadre / civil servant) |
+| `calculate_us_federal_tax` | US federal income tax 2026 (IRS brackets + standard deduction) |
+| `calculate_uk_income_tax` | UK income tax 2025/26 (HMRC bands, allowance taper) |
+| `calculate_canada_federal_tax` | Canadian federal income tax (CRA brackets + basic personal amount) |
+| `calculate_mortgage` | Monthly payment, total interest, optional amortization schedule |
+| `calculate_compound_interest` | Lump-sum compound growth with yearly breakdown |
+| `calculate_loan_payment` | Generic amortizing loan (term in months) |
+| `calculate_percentage` | Percent of total / percent change / what-percent |
+| `calculate_vat_generic` | Add or remove VAT/GST/sales tax at any rate |
+| `calculate_bmi` | Body Mass Index + WHO category |
+| `calculate_tdee` | Maintenance calories from BMR + activity level |
+| `list_bundles` | Discover the 31 thematic bundles of the full catalog |
+| `get_bundle_tools` | List the tools inside one bundle |
+| `call_any_calculator` | Invoke any of the 446 hosted calculators by name |
+
+## Parameters
+
+### calculate_french_income_tax
+
+- `income` (number, required, min 0): annual net taxable income in euros.
+- `parts` (number, default 1, 0.5 to 20): number of fiscal shares (1 = single, 2 = married, +0.5 per child).
+
+### calculate_french_salary
+
+- `gross_monthly` (number, required, min 0): gross monthly salary in euros.
+- `status` (default `cadre`): `cadre`, `non_cadre` or `fonction_publique`.
+
+### calculate_us_federal_tax
+
+- `income` (number, required, min 0): gross annual income in USD.
+- `filing_status` (default `single`): `single`, `married_joint`, `married_separate` or `head_of_household`.
+
+Federal only: state income tax and FICA are not included.
+
+### calculate_uk_income_tax
+
+- `income` (number, required, min 0): annual gross income in GBP.
+
+National Insurance is not included and Scottish bands are not modelled.
+
+### calculate_canada_federal_tax
+
+- `income_cad` (number, required, min 0): annual income in Canadian dollars.
+
+Federal only: provincial/territorial tax and CPP/EI are not included.
+
+### calculate_mortgage
+
+- `principal` (number, required, min 1): loan amount in currency units.
+- `annual_rate` (number, required, 0.01 to 30): annual interest rate in %.
+- `years` (number, required, 1 to 50): loan duration in years.
+- `with_schedule` (boolean, default false): include first 12 months + last month amortization.
+
+Insurance, taxes and fees are not included.
+
+### calculate_compound_interest
+
+- `principal` (number, required, min 0): initial amount.
+- `annual_rate` (number, required): annual interest rate in %.
+- `years` (number, required, min 0): investment duration in years.
+- `compounds_per_year` (number, default 12, min 1): compounding frequency per year.
+
+Formula: A = P(1+r/n)^(nt). For loans, use `calculate_loan_payment` or `calculate_mortgage`.
+
+### calculate_loan_payment
+
+- `principal` (number, required, min 1): loan amount.
+- `annual_rate` (number, required, 0.01 to 50): annual interest rate in %.
+- `months` (number, required, 1 to 600): loan duration in months.
+
+### calculate_percentage
+
+- `operation` (required): `of` (X% of Y), `change` (from A to B) or `what_pct` (X is what % of Y).
+- `a` (number, required): first value.
+- `b` (number, required): second value.
+
+### calculate_vat_generic
+
+- `amount` (number, required, min 0): amount.
+- `rate` (number, required, 0 to 100): tax rate in %.
+- `mode` (default `ht`): `ht` (before tax) or `ttc` (after tax).
+
+### calculate_bmi
+
+- `weight_kg` (number, required, min 1): weight in kilograms.
+- `height_cm` (number, required, min 50): height in centimeters.
+
+Screening indicator only, not a medical diagnosis; not valid for children or athletes with high muscle mass.
+
+### calculate_tdee
+
+- `bmr` (number, required, min 1): basal metabolic rate in kcal.
+- `activity_level` (required): `sedentary`, `light`, `moderate`, `active` or `very_active`.
+
+### list_bundles
+
+No meaningful parameter (an optional unused `_unused` string is accepted). Lists the 31 thematic bundles of the full
+catalog. Use it first when a calculator is not among the core tools.
+
+### get_bundle_tools
+
+- `bundle_id` (required): one of `finance-france`, `finance-belgique`, `finance-suisse`, `finance-us`, `finance-uk`,
+  `finance-afrique-quebec`, `finance-universal`, `immobilier`, `sante`, `sport`, `math`, `conversions`, `education`,
+  `construction`, `science`, `auto-transport`, `vie-quotidienne`, `temps-rh`, `cuisine`, `animaux`,
+  `astronomie-nature`, `voyage`, `jardinage`, `photographie`, `musique`, `crypto`, `jeux-probabilites`, `plomberie`,
+  `textile-mode`, `fun`, `energie`.
+
+Returns the tool names and descriptions inside the bundle.
+
+### call_any_calculator
+
+- `tool_name` (string, required): exact name of the target calculator as returned by `get_bundle_tools`
+  (for example `calculate_french_notary_fees`).
+- `arguments` (object): arguments of the target calculator. Pass `{}` if it takes none.
+
+The call is forwarded verbatim to the hosted macalc API (network request, no authentication). It returns the target
+calculator's JSON result (`result`, `formula`, `source`, `reference_url`) or an error if the tool name is unknown.
+
+## Workflow for the full catalog
+
+1. `list_bundles` to find the right domain.
+2. `get_bundle_tools` with the `bundle_id` to get the exact tool name and its parameters.
+3. `call_any_calculator` with that `tool_name` and its `arguments`.
+
+Results are estimates and not tax, medical or financial advice. More on the
+[MCP info page](https://macalculatriceenligne.com/mcp/) and in the
+[API docs](https://macalculatriceenligne.com/api-docs/).

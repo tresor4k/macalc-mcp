@@ -1,0 +1,99 @@
+---
+title: Overview
+description: What macalc-mcp is, how to install it and how the core profile relates to the full catalog.
+---
+
+# macalc-mcp
+
+`macalc-mcp` is a Model Context Protocol server for [MaCalculatriceEnLigne](https://macalculatriceenligne.com).
+It exposes a curated core of 15 calculator tools (income tax for France, the US, the UK and Canada, gross-to-net
+salary, mortgage, compound interest, loans, VAT, percentages, BMI, TDEE) and gives on-demand access to the full macalc
+catalog of 446 calculators through a discovery and dispatcher workflow. It is free and needs no API key.
+
+## Install
+
+Two modes: pick the one your MCP client supports.
+
+### Remote (Streamable HTTP, zero install)
+
+For clients with native remote MCP support. This mode serves the full 446-tool catalog directly.
+
+```json
+{
+  "mcpServers": {
+    "macalc": {
+      "url": "https://macalculatriceenligne.com/api/mcp"
+    }
+  }
+}
+```
+
+### Local stdio proxy (npm)
+
+For clients that only speak stdio, or sandboxed environments. This mode serves the curated 15-tool core profile by
+default; the full catalog is one dispatcher call away.
+
+```json
+{
+  "mcpServers": {
+    "macalc": {
+      "command": "npx",
+      "args": ["-y", "macalc-mcp"]
+    }
+  }
+}
+```
+
+### Docker
+
+The image is [`tresor4k/macalc-mcp`](https://hub.docker.com/r/tresor4k/macalc-mcp) on Docker Hub.
+
+```json
+{
+  "mcpServers": {
+    "macalc": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "tresor4k/macalc-mcp"]
+    }
+  }
+}
+```
+
+## Core profile and full catalog
+
+- The stdio wrapper exposes the 15 core tools by default. Set the environment variable `MACALC_MCP_FULL=1` to expose
+  the full remote catalog (446 tools) instead.
+- For a calculator that is not in the core, call `list_bundles`, then `get_bundle_tools` with a `bundle_id`, then
+  `call_any_calculator` with the tool name and its arguments.
+
+## Technical details
+
+| Property | Value |
+|---|---|
+| Endpoint | `https://macalculatriceenligne.com/api/mcp` |
+| Transport | Streamable HTTP (stateless) |
+| Auth | None (free, no API key) |
+| Rate limit | 1,000 calls/day |
+| Response format | Structured JSON with formula, source, reference URL |
+| Discovery | `https://macalculatriceenligne.com/.well-known/mcp/server.json` |
+
+## Example
+
+Ask your AI assistant: "Calculate the French income tax on 45,000 EUR for a single person". The assistant calls
+`calculate_french_income_tax` with `{income: 45000, parts: 1}`. The result carries the tax, the effective and marginal
+rates, the per-bracket breakdown, the source (Article 197 CGI) and a reference URL such as
+[the French income tax calculator](https://macalculatriceenligne.com/finance/fiscalite/calcul-impots/).
+
+See [Tools](/tools) for the list of tools.
+
+## Links
+
+- [Website](https://macalculatriceenligne.com/)
+- [MCP info page](https://macalculatriceenligne.com/mcp/)
+- [API docs](https://macalculatriceenligne.com/api-docs/)
+- [Chrome extension](https://macalculatriceenligne.com/extension-chrome/)
+- [Telegram bot](https://macalculatriceenligne.com/telegram/)
+- [npm package](https://www.npmjs.com/package/macalc-mcp)
+- [Docker Hub](https://hub.docker.com/r/tresor4k/macalc-mcp)
+
+Published by MaCalculatriceEnLigne. MIT license.
