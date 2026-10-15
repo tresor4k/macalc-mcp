@@ -135,6 +135,12 @@ Sunrise/sunset, moon phase, solar panel output, wind chill, heat index, carbon s
 ### Textile (5+ tools)
 Fabric yardage, knitting yarn calculator, ring/bra/hat size converters.
 
+## Exemples d'outils
+
+- [Impôt sur le revenu](https://macalculatriceenligne.com/finance/fiscalite/calcul-impots/) : page web du calculateur correspondant à l'outil `calculate_french_income_tax` (barème IR 2026, quotient familial).
+- [Salaire brut en net](https://macalculatriceenligne.com/finance/salaire/calcul-salaire-brut-net/) : page web du calculateur correspondant à l'outil `calculate_french_salary` (cadre, non-cadre, fonction publique).
+- [Mensualité de prêt immobilier](https://macalculatriceenligne.com/finance/immobilier/calcul-mensualite-pret-immobilier/) : page web du calculateur correspondant à l'outil `calculate_mortgage` (mensualité, intérêts totaux, tableau d'amortissement).
+
 ## Technical Details
 
 | Property | Value |
